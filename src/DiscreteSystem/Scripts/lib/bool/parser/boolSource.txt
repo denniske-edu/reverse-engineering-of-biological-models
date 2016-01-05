@@ -1,0 +1,44 @@
+﻿// Recognizes boolean expressions like "a&b|!c".
+
+{
+
+var And = (function () {
+  function And(l, r) { this._ = "And"; this.l = l; this.r = r; }
+  return And;
+})();
+
+var Or = (function () {
+  function Or(l, r) { this._ = "Or"; this.l = l; this.r = r; }
+  return Or;
+})();
+
+var Not = (function () {
+  function Not(child) { this._ = "Not"; this.child = child; }
+  return Not;
+})();
+
+}
+
+
+start
+  = and
+
+and
+  = left:or "|" right:and { return new Or(left, right); }
+  / or
+
+or
+  = left:not "&" right:or { return new And(left, right); }
+  / not
+
+not
+  = "!" child:primary { return new Not(child); }
+  / primary
+
+primary
+  = val
+  / "(" some:and ")" { return some; }
+
+val
+  = val:[01] { return val == "1"; }
+  / letters:[a-zA-Z_0-9]+ { return letters.join(''); }

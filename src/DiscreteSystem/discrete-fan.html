@@ -1,0 +1,215 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Discrete Fan</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<script type="text/javascript"
+			src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	</script>
+
+	<link rel="stylesheet" type="text/css" href="Content/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="Content/css/main.css">
+</head>
+<body>
+
+	<div class="container">
+		<div class="row">
+
+			<h2>Discrete Fan</h2>
+
+			<br />
+			<p>
+				<button class="btn" data-bind="click: sampleI"><span class="glyphicon glyphicon-list"></span> Sample I</button>
+			</p>
+
+			<h2>Input</h2>
+
+			<h3>Experimental Time Course Data</h3>
+
+			<form class="form-inline">
+				<div class="form-group" style="display:block">
+					
+					<table class="table" style="width: inherit">
+						<thead>
+						<tr>
+							<th style="font-weight: normal;width:100px">Time Step</th>
+							<!-- ko foreach: variables -->
+							<th data-bind="maths: $data"></th>
+							<!-- /ko -->
+							<th></th>
+						</tr>
+						</thead>
+						<tbody data-bind="foreach: inputs">
+						<tr>
+							<td data-bind="html: $index()+1"></td>
+							<!-- ko foreach: s -->
+							<td style="padding:0"><input data-bind="textInput: $data" style="border: none; padding: 8px; width: 100%;"/></td>
+							<!-- /ko -->
+							<td><button class="btn btn-xs" data-bind="click: remove" title="Remove"><span class="glyphicon glyphicon-minus-sign"></span></button></td>
+						</tr>
+						</tbody>
+					</table>
+
+					<p>
+						<button class="btn" data-bind="click: addInput"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
+					</p>
+
+					<br/>
+
+					<h3>Discretization Thresholds</h3>
+
+					<table class="table" style="width: inherit">
+						<thead>
+							<tr>
+								<th style="font-weight: normal;width:100px">Value</th>
+								<!-- ko foreach: variables -->
+								<th data-bind="maths: $data"></th>
+								<!-- /ko -->
+								<th></th>
+							</tr>
+						</thead>
+						<tbody data-bind="foreach: thresholds">
+							<tr>
+								<td style="padding:0"><input data-bind="textInput: val" style="border: none; padding: 8px; width: 100%;" /></td>
+								<!-- ko foreach: s -->
+								<td style="padding:0"><input data-bind="textInput: $data" style="border: none; padding: 8px; width: 100%;" /></td>
+								<!-- /ko -->
+								<td><button class="btn btn-xs" data-bind="click: remove" title="Remove"><span class="glyphicon glyphicon-minus-sign"></span></button></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<p>
+						<button class="btn" data-bind="click: addThreshold"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
+					</p>
+
+					<br />
+
+					<p>
+						<button class="btn btn-success" data-bind="click: compute, visible: !computed()"><span class="glyphicon glyphicon-play"></span> Compute</button>
+						<button class="btn btn-danger" data-bind="click: clear, visible: computed"><span class="glyphicon glyphicon-stop"></span> Clear current results</button>
+					</p>
+
+					<div data-bind="if: computed">
+						<br />
+						<h3>Discrete Time Course Data</h3>
+						<br />
+
+						<table class="table" style="width: inherit">
+							<thead>
+							<tr>
+								<th></th>
+								<!-- ko foreach: variables -->
+								<th data-bind="maths: $data"></th>
+								<!-- /ko -->
+							</tr>
+							</thead>
+							<tbody data-bind="foreach: inputsDiscrete">
+							<tr>
+								<td data-bind="html: $index()+1"></td>
+								<!-- ko foreach: s -->
+								<td data-bind="html: $data"></td>
+								<!-- /ko -->
+							</tr>
+							</tbody>
+						</table>
+
+
+						<h3>Polynomial System</h3> <!-- in \( \mathbb{R}^3 \) -->
+						<br/>
+
+						<p>
+							<span data-bind="maths: polynomialSystemLatex"></span>
+						</p>
+
+
+
+						<h3>Vanishing ideal of discrete points</h3>
+						<br />
+
+						<p>
+							<span data-bind="maths: vanishingIdealLatex"></span>
+						</p>
+
+
+
+						<h3>Reduction of Polynomial System by ideal</h3>
+						<br />
+
+						<p>
+							<span data-bind="maths: reducedPolynomialSystemLatex"></span>
+						</p>
+
+						<br />
+						<br />
+
+
+					</div>
+
+				</div>
+			</form>
+
+		</div>
+	</div>
+	
+
+	<script src="Scripts/external/jquery-2.1.3.js"></script>
+	<script src="Scripts/external/underscore.js"></script>
+	<script src="Scripts/external/knockout-3.3.0.js"></script>
+	<script src="Scripts/external/knockout-mathjax-bindings.js"></script>
+
+
+	<script src="Scripts/lib/bool/parser/boolParser.js"></script>
+	<script src="Scripts/lib/maths/parser/mathsParser.js"></script>
+
+	<script src="Scripts/lib/polynomial/structure/rings.js"></script>
+
+	<script src="Scripts/lib/helper/system.js"></script>
+	<script src="Scripts/lib/helper/helper.js"></script>
+
+	<script src="Scripts/lib/bool/structure/block.js"></script>
+	<script src="Scripts/lib/bool/structure/and.js"></script>
+	<script src="Scripts/lib/bool/structure/or.js"></script>
+	<script src="Scripts/lib/bool/structure/not.js"></script>
+	<script src="Scripts/lib/bool/printer.js"></script>
+
+	<script src="Scripts/lib/maths/structure/block.js"></script>
+	<script src="Scripts/lib/maths/structure/add.js"></script>
+	<script src="Scripts/lib/maths/structure/sub.js"></script>
+	<script src="Scripts/lib/maths/structure/mult.js"></script>
+	<script src="Scripts/lib/maths/structure/div.js"></script>
+	<script src="Scripts/lib/maths/decomposer.js"></script>
+	<script src="Scripts/lib/maths/simplifier.js"></script>
+	<script src="Scripts/lib/maths/flatter.js"></script>
+	<script src="Scripts/lib/maths/printer.js"></script>
+	<script src="Scripts/lib/maths/variables.js"></script>
+	<script src="Scripts/lib/maths/replacer.js"></script>
+
+	<script src="Scripts/lib/polynomial/parser/termParser.js"></script>
+	<script src="Scripts/lib/polynomial/parser/polynomialParser.js"></script>
+	<script src="Scripts/lib/polynomial/structure/orders.js"></script>
+	<script src="Scripts/lib/polynomial/structure/term.js"></script>
+	<script src="Scripts/lib/polynomial/structure/polynomial.js"></script>
+	<script src="Scripts/lib/polynomial/printers.js"></script>
+
+	<script src="Scripts/lib/algorithm/number.js"></script>
+	<script src="Scripts/lib/algorithm/division.js"></script>
+	<script src="Scripts/lib/algorithm/groebner.js"></script>
+	
+	<script src="Scripts/app/converter.js"></script>
+	<script src="Scripts/app/fast-converter.js"></script>
+	<script src="Scripts/app/fast-math-converter.js"></script>
+
+	<script src="Scripts/app/discrete-fan.js"></script>
+
+	<script>
+		var app = new DiscreteFan.DiscreteFan();
+		ko.applyBindings(app);
+	</script>
+
+</body>
+</html>
+
+
