@@ -12,7 +12,8 @@ module DiscreteFan {
 	import Variables = Maths.Variables;
 	import Replacer = Maths.Replacer;
 	import IntegerRingModulo2 = Polynomials.IntegerRingModulo2;
-	import IntegerRingModulo3 = Polynomials.IntegerRingModulo3;
+	import IntegerRingModulo = Polynomials.IntegerRingModulo;
+	import IntegerRingModulo3Special = Polynomials.IntegerRingModulo3Special;
 	import System = Helper.System;
 	import GroebnerAlgorithm = Algorithms.GroebnerAlgorithm;
 	import DivisionAlgorithm = Algorithms.DivisionAlgorithm;
@@ -30,7 +31,7 @@ module DiscreteFan {
 
 		constructor(app: DiscreteFan, val = null, s = []) {
 			this.app = app;
-			this.s = ko.observable(s);
+			this.s = ko.observableArray(s);
 			this.val = ko.observable(val);
 		}
 
@@ -41,51 +42,36 @@ module DiscreteFan {
 	}
 
 
-	export class InputItem {
+	export class InputVariable {
 
-		s;
-		expression;
-
-		variableHasFocus;
-		expressionHasFocus;
-
-		latex;
+		v: () => string;
 		app: DiscreteFan;
 
-		constructor(app: DiscreteFan, s = []) {
+		constructor(app: DiscreteFan, v = '') {
 			this.app = app;
-			this.s = ko.observable(s);
-
-			this.variableHasFocus = ko.observable(false);
-			this.expressionHasFocus = ko.observable(false);
-
-			//this.variableLatex = ko.computed(() => {
-			//	return this.getText(this.variable());
-			//});
-
-			//this.expressionLatex = ko.computed(() => {
-			//	return this.getText(this.expression());
-			//});
-
-			//this.latex = ko.computed(() => {
-			//	return this.getText(this.variable() + ' = ' + this.expression());
-			//});
+			this.v = ko.observable(v);
 		}
 
 		remove() {
 
+			this.app.removeVariable(this);
+		}
+	}
+
+
+	export class InputItem {
+
+		s;
+		app: DiscreteFan;
+
+		constructor(app: DiscreteFan, s = []) {
+			this.app = app;
+			this.s = ko.observableArray(s);
+		}
+
+		remove() {
 			this.app.removeInput(this);
 		}
-
-		getText(input: string): string {
-
-			return input.replace(/!/g, ' \\lnot ')
-				.replace(/&/g, ' \\wedge ')
-				.replace(/\|/g, ' \\lor ');
-		}
-
-		variableLatex;
-		expressionLatex;
 	}
 
     /**
@@ -168,8 +154,8 @@ module DiscreteFan {
 			//this.sampleII();
 			//this.compute();
 		}
-
-		sampleI() {
+		
+		sampleII() {
 
 
 			this.discretize = false;
@@ -184,11 +170,11 @@ module DiscreteFan {
 			System.ring = new IntegerRingModulo2();
 
 			this.variables.removeAll();
-			this.variables.push('M');
-			this.variables.push('B');
-			this.variables.push('A');
-			this.variables.push('L');
-			this.variables.push('P');
+			this.variables.push(new InputVariable(this, 'M'));
+			this.variables.push(new InputVariable(this, 'B'));
+			this.variables.push(new InputVariable(this, 'A'));
+			this.variables.push(new InputVariable(this, 'L'));
+			this.variables.push(new InputVariable(this, 'P'));
 
 			this.inputs.removeAll();
 			this.inputs.push(new InputItem(this, [0, 1, 0, 0, 0]));
@@ -217,17 +203,17 @@ module DiscreteFan {
 			//this.inputs.push(new InputItem(this, [0, 0, 1, 0, 0]));
 		}
 
-		sampleII() {
+		sampleI() {
 
 			this.discretize = true;
 			
 			// Z3-Ring
-			System.ring = new IntegerRingModulo3();
+			System.ring = new IntegerRingModulo3Special();
 
 			this.variables.removeAll();
-			this.variables.push('x_1');
-			this.variables.push('x_2');
-			this.variables.push('x_3');
+			this.variables.push(new InputVariable(this, 'x_1'));
+			this.variables.push(new InputVariable(this, 'x_2'));
+			this.variables.push(new InputVariable(this, 'x_3'));
 
 			this.inputs.removeAll();
 		
@@ -435,7 +421,7 @@ module DiscreteFan {
 				return i;
 			}
 
-			System.variables = ['t'].concat(this.variables());
+			System.variables = ['t'].concat(_.map(<InputVariable[]>this.variables(), v => v.v()));
 
 			var polynomialSystem: Polynomials.Polynomial[] = [];
 
@@ -460,7 +446,7 @@ module DiscreteFan {
 
 						alreadyAdded.push([ind, points[j][ind] - points[k][ind]]);
 
-						var t = `(${points[j][ind]}~${points[k][ind]})*(${this.variables()[ind]}~${points[k][ind]})`; // ^(p-2)
+						var t = `(${points[j][ind]}~${points[k][ind]})*(${this.variables()[ind].v()}~${points[k][ind]})`; // ^(p-2)
 
 						var p = FastMathConverter.run(MathsParser.parse(t));
 
@@ -496,7 +482,7 @@ module DiscreteFan {
 				var g = [];
 
 				for (j = 0; j < this.variables().length; j++) {
-					var variable = this.variables()[j];
+					var variable = this.variables()[j].v();
 
 					var t = `(${variable}~${points[i][j]})`;
 
@@ -581,9 +567,43 @@ module DiscreteFan {
 			this.computed(false);
 		}
 
+		addVariable() {
+
+			for (var i = 0; i < this.inputs().length; i++) {
+				this.inputs()[i].s.push(0);
+			}
+
+			for (var i = 0; i < this.thresholds().length; i++) {
+				this.thresholds()[i].s.push('');
+			}
+
+			this.variables.push(new InputVariable(this));
+		}
+
 		addInput() {
 
-			this.inputs.push(new InputItem(this));
+			var a = [];
+
+			for (var i = 0; i < this.variables().length; i++) {
+				a.push(0);
+			}
+
+			this.inputs.push(new InputItem(this, a));
+		}
+
+		removeVariable(e) {
+
+			var ind = this.variables().indexOf(e);
+
+			for (var i = 0; i < this.inputs().length; i++) {
+				this.inputs()[i].s.splice(ind, 1);
+			}
+
+			for (var i = 0; i < this.thresholds().length; i++) {
+				this.thresholds()[i].s.splice(ind, 1);
+			}
+
+			this.variables.remove(e);
 		}
 
 		removeInput(e) {
@@ -591,9 +611,33 @@ module DiscreteFan {
 			this.inputs.remove(e);
 		}
 
-		addThreshold() {
+		ring2() {
 
-			this.thresholds.push(new Threshold(this));
+			System.ring = new IntegerRingModulo2();
+
+			this.thresholds.removeAll();
+			this.thresholds.push(new Threshold(this, 0));
+			this.thresholds.push(new Threshold(this, 1));
+		}
+
+		ring3() {
+
+			System.ring = new IntegerRingModulo(3);
+
+			this.thresholds.removeAll();
+			this.thresholds.push(new Threshold(this, 0));
+			this.thresholds.push(new Threshold(this, 1));
+			this.thresholds.push(new Threshold(this, 2));
+		}
+
+		ring3Special() {
+
+			System.ring = new IntegerRingModulo3Special();
+
+			this.thresholds.removeAll();
+			this.thresholds.push(new Threshold(this, -1));
+			this.thresholds.push(new Threshold(this, 0));
+			this.thresholds.push(new Threshold(this, 1));
 		}
 
 		removeThreshold(e) {

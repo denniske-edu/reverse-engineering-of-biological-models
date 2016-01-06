@@ -57,7 +57,25 @@ module Polynomials {
 		}
 	}
 
-	export class IntegerRingModulo3 extends Ring {
+	export class IntegerRingModulo extends Ring {
+
+		mod: number; 
+
+		constructor(mod: number) {
+			this.mod = mod;
+			super();
+		}
+
+		val(a: number): number {
+			return Math.abs(a % this.mod);
+		}
+
+		power(a: number): number {
+			return a;
+		}
+	}
+
+	export class IntegerRingModulo3Special extends Ring {
 
 		constructor() {
 			super();

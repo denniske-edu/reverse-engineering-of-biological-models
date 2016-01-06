@@ -64,12 +64,27 @@ var Polynomials;
         return IntegerRingModulo2;
     })(Ring);
     Polynomials.IntegerRingModulo2 = IntegerRingModulo2;
-    var IntegerRingModulo3 = (function (_super) {
-        __extends(IntegerRingModulo3, _super);
-        function IntegerRingModulo3() {
+    var IntegerRingModulo = (function (_super) {
+        __extends(IntegerRingModulo, _super);
+        function IntegerRingModulo(mod) {
+            this.mod = mod;
             _super.call(this);
         }
-        IntegerRingModulo3.prototype.val = function (a) {
+        IntegerRingModulo.prototype.val = function (a) {
+            return Math.abs(a % this.mod);
+        };
+        IntegerRingModulo.prototype.power = function (a) {
+            return a;
+        };
+        return IntegerRingModulo;
+    })(Ring);
+    Polynomials.IntegerRingModulo = IntegerRingModulo;
+    var IntegerRingModulo3Special = (function (_super) {
+        __extends(IntegerRingModulo3Special, _super);
+        function IntegerRingModulo3Special() {
+            _super.call(this);
+        }
+        IntegerRingModulo3Special.prototype.val = function (a) {
             var temp = a % 3;
             if (temp === -2)
                 return 1;
@@ -83,11 +98,11 @@ var Polynomials;
                 return -1;
             throw new Error('Not implemented.');
         };
-        IntegerRingModulo3.prototype.power = function (a) {
+        IntegerRingModulo3Special.prototype.power = function (a) {
             return a;
         };
-        return IntegerRingModulo3;
+        return IntegerRingModulo3Special;
     })(Ring);
-    Polynomials.IntegerRingModulo3 = IntegerRingModulo3;
+    Polynomials.IntegerRingModulo3Special = IntegerRingModulo3Special;
 })(Polynomials || (Polynomials = {}));
 //# sourceMappingURL=rings.js.map

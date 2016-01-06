@@ -36,7 +36,7 @@
 						<tr>
 							<th style="font-weight: normal;width:100px">Time Step</th>
 							<!-- ko foreach: variables -->
-							<th data-bind="maths: $data"></th>
+							<th><input data-bind="textInput: v" style="border: 1px solid #DDD; padding: 8px;"/> <button class="btn btn-xs" data-bind="click: remove" title="Remove variable"><span class="glyphicon glyphicon-minus-sign"></span></button></th>
 							<!-- /ko -->
 							<th></th>
 						</tr>
@@ -53,7 +53,8 @@
 					</table>
 
 					<p>
-						<button class="btn" data-bind="click: addInput"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
+						<button class="btn" data-bind="click: addInput"><span class="glyphicon glyphicon-plus-sign"></span> Add time step</button>
+						<button class="btn" data-bind="click: addVariable"><span class="glyphicon glyphicon-plus-sign"></span> Add variable</button>
 					</p>
 
 					<br/>
@@ -65,14 +66,14 @@
 							<tr>
 								<th style="font-weight: normal;width:100px">Value</th>
 								<!-- ko foreach: variables -->
-								<th data-bind="maths: $data"></th>
+								<th data-bind="maths: v"></th>
 								<!-- /ko -->
 								<th></th>
 							</tr>
 						</thead>
 						<tbody data-bind="foreach: thresholds">
 							<tr>
-								<td style="padding:0"><input data-bind="textInput: val" style="border: none; padding: 8px; width: 100%;" /></td>
+								<td data-bind="text: val"></td>
 								<!-- ko foreach: s -->
 								<td style="padding:0"><input data-bind="textInput: $data" style="border: none; padding: 8px; width: 100%;" /></td>
 								<!-- /ko -->
@@ -82,7 +83,9 @@
 					</table>
 
 					<p>
-						<button class="btn" data-bind="click: addThreshold"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
+						<button class="btn" data-bind="click: ring2">\( \mathbb{R}^2 (0, 1) \)</button>
+						<button class="btn" data-bind="click: ring3">\( \mathbb{R}^3 (0, 1, 2) \)</button>
+						<button class="btn" data-bind="click: ring3Special">\( \mathbb{R}^3 (-1, 0, 1) \)</button>
 					</p>
 
 					<br />
@@ -102,7 +105,7 @@
 							<tr>
 								<th></th>
 								<!-- ko foreach: variables -->
-								<th data-bind="maths: $data"></th>
+								<th data-bind="maths: v"></th>
 								<!-- /ko -->
 							</tr>
 							</thead>

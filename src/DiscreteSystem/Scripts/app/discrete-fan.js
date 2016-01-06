@@ -4,7 +4,8 @@ var DiscreteFan;
     var PolynomialPrinter = Polynomials.PolynomialPrinter;
     var PolynomialParser = Polynomials.PolynomialParser;
     var IntegerRingModulo2 = Polynomials.IntegerRingModulo2;
-    var IntegerRingModulo3 = Polynomials.IntegerRingModulo3;
+    var IntegerRingModulo = Polynomials.IntegerRingModulo;
+    var IntegerRingModulo3Special = Polynomials.IntegerRingModulo3Special;
     var System = Helper.System;
     var GroebnerAlgorithm = Algorithms.GroebnerAlgorithm;
     var DivisionAlgorithm = Algorithms.DivisionAlgorithm;
@@ -14,7 +15,7 @@ var DiscreteFan;
             if (val === void 0) { val = null; }
             if (s === void 0) { s = []; }
             this.app = app;
-            this.s = ko.observable(s);
+            this.s = ko.observableArray(s);
             this.val = ko.observable(val);
         }
         Threshold.prototype.remove = function () {
@@ -23,28 +24,26 @@ var DiscreteFan;
         return Threshold;
     })();
     _DiscreteFan.Threshold = Threshold;
+    var InputVariable = (function () {
+        function InputVariable(app, v) {
+            if (v === void 0) { v = ''; }
+            this.app = app;
+            this.v = ko.observable(v);
+        }
+        InputVariable.prototype.remove = function () {
+            this.app.removeVariable(this);
+        };
+        return InputVariable;
+    })();
+    _DiscreteFan.InputVariable = InputVariable;
     var InputItem = (function () {
         function InputItem(app, s) {
             if (s === void 0) { s = []; }
             this.app = app;
-            this.s = ko.observable(s);
-            this.variableHasFocus = ko.observable(false);
-            this.expressionHasFocus = ko.observable(false);
-            //this.variableLatex = ko.computed(() => {
-            //	return this.getText(this.variable());
-            //});
-            //this.expressionLatex = ko.computed(() => {
-            //	return this.getText(this.expression());
-            //});
-            //this.latex = ko.computed(() => {
-            //	return this.getText(this.variable() + ' = ' + this.expression());
-            //});
+            this.s = ko.observableArray(s);
         }
         InputItem.prototype.remove = function () {
             this.app.removeInput(this);
-        };
-        InputItem.prototype.getText = function (input) {
-            return input.replace(/!/g, ' \\lnot ').replace(/&/g, ' \\wedge ').replace(/\|/g, ' \\lor ');
         };
         return InputItem;
     })();
@@ -97,7 +96,7 @@ var DiscreteFan;
             //this.sampleII();
             //this.compute();
         }
-        DiscreteFan.prototype.sampleI = function () {
+        DiscreteFan.prototype.sampleII = function () {
             this.discretize = false;
             //1 1.6104 1.2042 1.0072
             //2 1.7073 1.3252 1.0185
@@ -107,11 +106,11 @@ var DiscreteFan;
             // Z3-Ring
             System.ring = new IntegerRingModulo2();
             this.variables.removeAll();
-            this.variables.push('M');
-            this.variables.push('B');
-            this.variables.push('A');
-            this.variables.push('L');
-            this.variables.push('P');
+            this.variables.push(new InputVariable(this, 'M'));
+            this.variables.push(new InputVariable(this, 'B'));
+            this.variables.push(new InputVariable(this, 'A'));
+            this.variables.push(new InputVariable(this, 'L'));
+            this.variables.push(new InputVariable(this, 'P'));
             this.inputs.removeAll();
             this.inputs.push(new InputItem(this, [0, 1, 0, 0, 0]));
             this.inputs.push(new InputItem(this, [0, 0, 0, 0, 0]));
@@ -134,14 +133,14 @@ var DiscreteFan;
             //this.inputs.push(new InputItem(this, [0, 1, 0, 1, 0]));
             //this.inputs.push(new InputItem(this, [0, 0, 1, 0, 0]));
         };
-        DiscreteFan.prototype.sampleII = function () {
+        DiscreteFan.prototype.sampleI = function () {
             this.discretize = true;
             // Z3-Ring
-            System.ring = new IntegerRingModulo3();
+            System.ring = new IntegerRingModulo3Special();
             this.variables.removeAll();
-            this.variables.push('x_1');
-            this.variables.push('x_2');
-            this.variables.push('x_3');
+            this.variables.push(new InputVariable(this, 'x_1'));
+            this.variables.push(new InputVariable(this, 'x_2'));
+            this.variables.push(new InputVariable(this, 'x_3'));
             this.inputs.removeAll();
             this.inputs.push(new InputItem(this, [1.6104, 1.2042, 1.0072]));
             this.inputs.push(new InputItem(this, [1.7073, 1.3252, 1.0185]));
@@ -293,7 +292,7 @@ var DiscreteFan;
                     return -1;
                 return i;
             };
-            System.variables = ['t'].concat(this.variables());
+            System.variables = ['t'].concat(_.map(this.variables(), function (v) { return v.v(); }));
             var polynomialSystem = [];
             for (i = 0; i < this.variables().length; i++) {
                 var variable = this.variables()[i];
@@ -308,7 +307,7 @@ var DiscreteFan;
                         if (_.any(alreadyAdded, function (p) { return p[0] === ind && p[1] === points[j][ind] - points[k][ind]; }))
                             continue;
                         alreadyAdded.push([ind, points[j][ind] - points[k][ind]]);
-                        var t = "(" + points[j][ind] + "~" + points[k][ind] + ")*(" + this.variables()[ind] + "~" + points[k][ind] + ")"; // ^(p-2)
+                        var t = "(" + points[j][ind] + "~" + points[k][ind] + ")*(" + this.variables()[ind].v() + "~" + points[k][ind] + ")"; // ^(p-2)
                         var p = FastMathConverter.run(MathsParser.parse(t));
                         var test1 = PolynomialPrinter.run(f);
                         f = f.multiply(p);
@@ -331,7 +330,7 @@ var DiscreteFan;
             for (i = 0; i < points.length; i++) {
                 var g = [];
                 for (j = 0; j < this.variables().length; j++) {
-                    var variable = this.variables()[j];
+                    var variable = this.variables()[j].v();
                     var t = "(" + variable + "~" + points[i][j] + ")";
                     var p = FastMathConverter.run(MathsParser.parse(t));
                     g.push(p);
@@ -385,14 +384,54 @@ var DiscreteFan;
             this.groebnerExpressions.removeAll();
             this.computed(false);
         };
+        DiscreteFan.prototype.addVariable = function () {
+            for (var i = 0; i < this.inputs().length; i++) {
+                this.inputs()[i].s.push(0);
+            }
+            for (var i = 0; i < this.thresholds().length; i++) {
+                this.thresholds()[i].s.push('');
+            }
+            this.variables.push(new InputVariable(this));
+        };
         DiscreteFan.prototype.addInput = function () {
-            this.inputs.push(new InputItem(this));
+            var a = [];
+            for (var i = 0; i < this.variables().length; i++) {
+                a.push(0);
+            }
+            this.inputs.push(new InputItem(this, a));
+        };
+        DiscreteFan.prototype.removeVariable = function (e) {
+            var ind = this.variables().indexOf(e);
+            for (var i = 0; i < this.inputs().length; i++) {
+                this.inputs()[i].s.splice(ind, 1);
+            }
+            for (var i = 0; i < this.thresholds().length; i++) {
+                this.thresholds()[i].s.splice(ind, 1);
+            }
+            this.variables.remove(e);
         };
         DiscreteFan.prototype.removeInput = function (e) {
             this.inputs.remove(e);
         };
-        DiscreteFan.prototype.addThreshold = function () {
-            this.thresholds.push(new Threshold(this));
+        DiscreteFan.prototype.ring2 = function () {
+            System.ring = new IntegerRingModulo2();
+            this.thresholds.removeAll();
+            this.thresholds.push(new Threshold(this, 0));
+            this.thresholds.push(new Threshold(this, 1));
+        };
+        DiscreteFan.prototype.ring3 = function () {
+            System.ring = new IntegerRingModulo(3);
+            this.thresholds.removeAll();
+            this.thresholds.push(new Threshold(this, 0));
+            this.thresholds.push(new Threshold(this, 1));
+            this.thresholds.push(new Threshold(this, 2));
+        };
+        DiscreteFan.prototype.ring3Special = function () {
+            System.ring = new IntegerRingModulo3Special();
+            this.thresholds.removeAll();
+            this.thresholds.push(new Threshold(this, -1));
+            this.thresholds.push(new Threshold(this, 0));
+            this.thresholds.push(new Threshold(this, 1));
         };
         DiscreteFan.prototype.removeThreshold = function (e) {
             this.thresholds.remove(e);
