@@ -94,8 +94,8 @@ var DiscreteFan;
             //this.groebnerExpressionsLatex = ko.computed(() => {
             //	return this.getEquationLatex(this.groebnerExpressions());
             //});
-            this.sampleII();
-            this.compute();
+            //this.sampleII();
+            //this.compute();
         }
         DiscreteFan.prototype.sampleI = function () {
             this.discretize = false;
