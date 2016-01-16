@@ -123,6 +123,18 @@ module DiscreteFan {
 			this.reducedPolynomialSystemLatex = ko.observable('');
 			this.vanishingIdealLatex = ko.observable('');
 
+
+			//System.variables = ['a', 'b', 'c'];
+
+			//var p1 = FastMathConverter.run(MathsParser.parse('a*a+b*b'));
+			//var p2 = FastMathConverter.run(MathsParser.parse('a~c'));
+
+			//var F = [p1, p2];
+
+			//var result = GroebnerAlgorithm.run(F, new Plex());
+			//var test1 = PolynomialPrinter.run(result);
+
+
 			//this.allVariables = ko.computed(() => {
 			//	return this.boundVariables().concat(this.freeVariables());
 			//});
@@ -151,8 +163,8 @@ module DiscreteFan {
 			//	return this.getEquationLatex(this.groebnerExpressions());
 			//});
 
-			//this.sampleII();
-			//this.compute();
+			this.sampleI();
+			this.compute();
 		}
 		
 		sampleII() {
@@ -303,8 +315,6 @@ module DiscreteFan {
 		}
 
 
-
-
 		compute() {
 
 			this.computed(true);
@@ -328,7 +338,7 @@ module DiscreteFan {
 				thresholds.push(threshold.s());
 			}
 
-			if(this.discretize)
+			if (this.discretize)
 				this.discretize1(points, values, thresholds);
 
 			for (i = 0; i < points.length; i++) {
@@ -377,7 +387,7 @@ module DiscreteFan {
 			//	var poly = new Polynomials.Polynomial();
 
 			//	for (var j = 0; j < points.length-1; j++) {
-					
+
 			//		if(results[j] == null) continue;
 
 			//		var f = PolynomialParser.parse(results[j][i].toString());
@@ -412,7 +422,7 @@ module DiscreteFan {
 
 			//	polynomialSystem.push(poly);
 			//}
-			
+
 
 			var firstDifference = (a: number[], b: number[]) => {
 				var i = 0;
@@ -437,7 +447,7 @@ module DiscreteFan {
 					var alreadyAdded = [];
 
 					for (var k = 0; k < points.length; k++) {
-						
+
 						var ind = firstDifference(points[j], points[k]);
 
 						if (ind === -1) continue;
@@ -467,7 +477,7 @@ module DiscreteFan {
 
 			for (var m = 0; m < polynomialSystem.length; m++) {
 				polynomialSystem[m].order();
-				polynomialSystemArray.push([`f_${m+1}^0`, PolynomialPrinter.run(polynomialSystem[m])]);
+				polynomialSystemArray.push([`f_${m + 1}^0`, PolynomialPrinter.run(polynomialSystem[m])]);
 			}
 
 			this.polynomialSystemLatex(this.getEquationLatex(polynomialSystemArray));
@@ -526,12 +536,45 @@ module DiscreteFan {
 			}
 
 			var vanishingIdeal = maximalIdeals[0];
-			
+
 			_.each(vanishingIdeal, p => p.order());
 
 			//vanishingIdeal = vanishingIdeal.slice(0, 3);
 
 			this.vanishingIdealLatex(this.getIdealLatex(vanishingIdeal));
+
+
+			// Using YQL and JSONP
+			$.ajax({
+				url: "http://ec2-52-28-60-46.eu-central-1.compute.amazonaws.com:8080/",
+
+				// The name of the callback parameter, as specified by the YQL service
+				jsonp: "callback",
+
+				// Tell jQuery we're expecting JSONP
+				dataType: "jsonp",
+
+				// Tell YQL what we want and that we want JSON
+				data: {
+					q: "test",
+					format: "json"
+				},
+
+				// Work with the response
+				success(response) {
+					console.log(response); // server response
+					this.computeWithResult(response);
+				},
+
+				// Work with the response
+				error(response) {
+					console.log(response); // server response
+				}
+			});
+
+		}
+
+		computeWithResult(cones:string) {
 
 			// Reduce polynomial system
 

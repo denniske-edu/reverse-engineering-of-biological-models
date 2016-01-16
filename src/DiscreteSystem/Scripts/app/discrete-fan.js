@@ -72,6 +72,12 @@ var DiscreteFan;
             this.polynomialSystemLatex = ko.observable('');
             this.reducedPolynomialSystemLatex = ko.observable('');
             this.vanishingIdealLatex = ko.observable('');
+            //System.variables = ['a', 'b', 'c'];
+            //var p1 = FastMathConverter.run(MathsParser.parse('a*a+b*b'));
+            //var p2 = FastMathConverter.run(MathsParser.parse('a~c'));
+            //var F = [p1, p2];
+            //var result = GroebnerAlgorithm.run(F, new Plex());
+            //var test1 = PolynomialPrinter.run(result);
             //this.allVariables = ko.computed(() => {
             //	return this.boundVariables().concat(this.freeVariables());
             //});
@@ -93,8 +99,8 @@ var DiscreteFan;
             //this.groebnerExpressionsLatex = ko.computed(() => {
             //	return this.getEquationLatex(this.groebnerExpressions());
             //});
-            //this.sampleII();
-            //this.compute();
+            this.sampleI();
+            this.compute();
         }
         DiscreteFan.prototype.sampleII = function () {
             this.discretize = false;
@@ -362,6 +368,30 @@ var DiscreteFan;
             _.each(vanishingIdeal, function (p) { return p.order(); });
             //vanishingIdeal = vanishingIdeal.slice(0, 3);
             this.vanishingIdealLatex(this.getIdealLatex(vanishingIdeal));
+            // Using YQL and JSONP
+            $.ajax({
+                url: "http://ec2-52-28-60-46.eu-central-1.compute.amazonaws.com:8080/",
+                // The name of the callback parameter, as specified by the YQL service
+                jsonp: "callback",
+                // Tell jQuery we're expecting JSONP
+                dataType: "jsonp",
+                // Tell YQL what we want and that we want JSON
+                data: {
+                    q: "test",
+                    format: "json"
+                },
+                // Work with the response
+                success: function (response) {
+                    console.log(response); // server response
+                    this.computeWithResult(response);
+                },
+                // Work with the response
+                error: function (response) {
+                    console.log(response); // server response
+                }
+            });
+        };
+        DiscreteFan.prototype.computeWithResult = function (cones) {
             // Reduce polynomial system
             var reducedPolynomialSystem = [];
             for (var l = 0; l < polynomialSystem.length; l++) {
