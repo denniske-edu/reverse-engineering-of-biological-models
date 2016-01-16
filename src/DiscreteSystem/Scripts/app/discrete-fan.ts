@@ -543,6 +543,7 @@ module DiscreteFan {
 
 			this.vanishingIdealLatex(this.getIdealLatex(vanishingIdeal));
 
+			var _this = this;
 
 			// Using YQL and JSONP
 			$.ajax({
@@ -556,14 +557,14 @@ module DiscreteFan {
 
 				// Tell YQL what we want and that we want JSON
 				data: {
-					q: "test",
-					format: "json"
+					vars: 'Q[' + System.variables.join(',') + ']',
+					polys: '{' + _.map(vanishingIdeal, v => PolynomialPrinter.run(v)).join(',') + '}'
 				},
 
 				// Work with the response
 				success(response) {
 					console.log(response); // server response
-					this.computeWithResult(response);
+					_this.computeWithResult(response);
 				},
 
 				// Work with the response
@@ -576,27 +577,30 @@ module DiscreteFan {
 
 		computeWithResult(cones:string) {
 
+			cones = cones.substr(cones.indexOf('\n') + 1);
+			cones = cones.replace(/(?:\r\n|\r|\n)/g, '');
+
 			// Reduce polynomial system
 
-			var reducedPolynomialSystem: Polynomials.Polynomial[] = [];
+			//var reducedPolynomialSystem: Polynomials.Polynomial[] = [];
 
-			for (var l = 0; l < polynomialSystem.length; l++) {
+			//for (var l = 0; l < polynomialSystem.length; l++) {
 
-				var polyn = polynomialSystem[l];
+			//	var polyn = polynomialSystem[l];
 
-				var result = DivisionAlgorithm.run(polyn, vanishingIdeal);
+			//	var result = DivisionAlgorithm.run(polyn, vanishingIdeal);
 
-				reducedPolynomialSystem.push(result.r);
-			}
-			
-			var reducedPolynomialSystemArray = [];
+			//	reducedPolynomialSystem.push(result.r);
+			//}
 
-			for (var m = 0; m < reducedPolynomialSystem.length; m++) {
-				reducedPolynomialSystem[m].order();
-				reducedPolynomialSystemArray.push([`f_${m + 1}`, PolynomialPrinter.run(reducedPolynomialSystem[m])]);
-			}
+			//var reducedPolynomialSystemArray = [];
 
-			this.reducedPolynomialSystemLatex(this.getEquationLatex(reducedPolynomialSystemArray));
+			//for (var m = 0; m < reducedPolynomialSystem.length; m++) {
+			//	reducedPolynomialSystem[m].order();
+			//	reducedPolynomialSystemArray.push([`f_${m + 1}`, PolynomialPrinter.run(reducedPolynomialSystem[m])]);
+			//}
+
+			//this.reducedPolynomialSystemLatex(this.getEquationLatex(reducedPolynomialSystemArray));
 		}
 
 		clear() {

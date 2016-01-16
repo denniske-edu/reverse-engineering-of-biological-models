@@ -21,7 +21,10 @@ app.get('/', function (req, res) {
 		content += data;
 	});
 
-	child.stdin.write('{a^2-b,a-c}\n');
+	child.stdin.write(req.query.vars);
+	child.stdin.write('\n');
+	child.stdin.write(req.query.polys);
+	child.stdin.write('\n');
 
 	//exec("gfan", function (error, stdout, stderr) {
 	//	sys.print('stdout: ' + stdout);

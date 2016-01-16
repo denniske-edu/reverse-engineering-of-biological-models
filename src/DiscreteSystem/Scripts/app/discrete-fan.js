@@ -8,7 +8,6 @@ var DiscreteFan;
     var IntegerRingModulo3Special = Polynomials.IntegerRingModulo3Special;
     var System = Helper.System;
     var GroebnerAlgorithm = Algorithms.GroebnerAlgorithm;
-    var DivisionAlgorithm = Algorithms.DivisionAlgorithm;
     var FastMathConverter = App.FastMathConverter;
     var Threshold = (function () {
         function Threshold(app, val, s) {
@@ -368,6 +367,7 @@ var DiscreteFan;
             _.each(vanishingIdeal, function (p) { return p.order(); });
             //vanishingIdeal = vanishingIdeal.slice(0, 3);
             this.vanishingIdealLatex(this.getIdealLatex(vanishingIdeal));
+            var _this = this;
             // Using YQL and JSONP
             $.ajax({
                 url: "http://ec2-52-28-60-46.eu-central-1.compute.amazonaws.com:8080/",
@@ -377,13 +377,13 @@ var DiscreteFan;
                 dataType: "jsonp",
                 // Tell YQL what we want and that we want JSON
                 data: {
-                    q: "test",
-                    format: "json"
+                    vars: 'Q[' + System.variables.join(',') + ']',
+                    polys: '{' + _.map(vanishingIdeal, function (v) { return PolynomialPrinter.run(v); }).join(',') + '}'
                 },
                 // Work with the response
                 success: function (response) {
                     console.log(response); // server response
-                    this.computeWithResult(response);
+                    _this.computeWithResult(response);
                 },
                 // Work with the response
                 error: function (response) {
@@ -392,19 +392,21 @@ var DiscreteFan;
             });
         };
         DiscreteFan.prototype.computeWithResult = function (cones) {
+            cones = cones.substr(cones.indexOf('\n') + 1);
+            cones = cones.replace(/(?:\r\n|\r|\n)/g, '');
             // Reduce polynomial system
-            var reducedPolynomialSystem = [];
-            for (var l = 0; l < polynomialSystem.length; l++) {
-                var polyn = polynomialSystem[l];
-                var result = DivisionAlgorithm.run(polyn, vanishingIdeal);
-                reducedPolynomialSystem.push(result.r);
-            }
-            var reducedPolynomialSystemArray = [];
-            for (var m = 0; m < reducedPolynomialSystem.length; m++) {
-                reducedPolynomialSystem[m].order();
-                reducedPolynomialSystemArray.push([("f_" + (m + 1)), PolynomialPrinter.run(reducedPolynomialSystem[m])]);
-            }
-            this.reducedPolynomialSystemLatex(this.getEquationLatex(reducedPolynomialSystemArray));
+            //var reducedPolynomialSystem: Polynomials.Polynomial[] = [];
+            //for (var l = 0; l < polynomialSystem.length; l++) {
+            //	var polyn = polynomialSystem[l];
+            //	var result = DivisionAlgorithm.run(polyn, vanishingIdeal);
+            //	reducedPolynomialSystem.push(result.r);
+            //}
+            //var reducedPolynomialSystemArray = [];
+            //for (var m = 0; m < reducedPolynomialSystem.length; m++) {
+            //	reducedPolynomialSystem[m].order();
+            //	reducedPolynomialSystemArray.push([`f_${m + 1}`, PolynomialPrinter.run(reducedPolynomialSystem[m])]);
+            //}
+            //this.reducedPolynomialSystemLatex(this.getEquationLatex(reducedPolynomialSystemArray));
         };
         DiscreteFan.prototype.clear = function () {
             this.ringExpressions.removeAll();
