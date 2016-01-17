@@ -137,13 +137,20 @@
 						</p>
 
 
+						<h3>Reduction of Polynomial System by bases of Gröbner cones</h3>
 
-						<h3>Reduction of Polynomial System by ideal</h3>
-						<br />
+						<div data-bind="foreach: cones">
+							<div style="margin-top: 30px;margin-bottom: 13px">
+								<b>Cone <span data-bind="text: $index()+1"></span>:</b><br/>
+								<div style="margin-top: 7px" data-bind="maths: basisLatex"></div>
+							</div>
 
-						<p>
-							<span data-bind="maths: reducedPolynomialSystemLatex"></span>
-						</p>
+							Reduced Polynomial System:
+							<p style="margin-top: 12px">
+									<span data-bind="maths: systemLatex"></span>
+								</p>
+
+							</div>
 
 						<br />
 						<br />

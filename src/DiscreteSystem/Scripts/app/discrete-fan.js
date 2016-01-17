@@ -8,6 +8,7 @@ var DiscreteFan;
     var IntegerRingModulo3Special = Polynomials.IntegerRingModulo3Special;
     var System = Helper.System;
     var GroebnerAlgorithm = Algorithms.GroebnerAlgorithm;
+    var DivisionAlgorithm = Algorithms.DivisionAlgorithm;
     var FastMathConverter = App.FastMathConverter;
     var Threshold = (function () {
         function Threshold(app, val, s) {
@@ -47,6 +48,13 @@ var DiscreteFan;
         return InputItem;
     })();
     _DiscreteFan.InputItem = InputItem;
+    var ConeItem = (function () {
+        function ConeItem() {
+            this.basis = [];
+        }
+        return ConeItem;
+    })();
+    _DiscreteFan.ConeItem = ConeItem;
     /**
      * Abstract base class of all parsers.
      *
@@ -60,6 +68,7 @@ var DiscreteFan;
             this.inputsDiscrete = ko.observableArray();
             this.inputs = ko.observableArray();
             this.inputs.push(new InputItem(this));
+            this.cones = ko.observableArray();
             this.ringExpressions = ko.observableArray();
             this.simplifiedExpressions = ko.observableArray();
             this.polynomialExpressions = ko.observableArray();
@@ -383,7 +392,7 @@ var DiscreteFan;
                 // Work with the response
                 success: function (response) {
                     console.log(response); // server response
-                    _this.computeWithResult(response);
+                    _this.computeWithResult(polynomialSystem, response);
                 },
                 // Work with the response
                 error: function (response) {
@@ -391,22 +400,53 @@ var DiscreteFan;
                 }
             });
         };
-        DiscreteFan.prototype.computeWithResult = function (cones) {
+        DiscreteFan.prototype.computeWithResult = function (polynomialSystem, cones) {
             cones = cones.substr(cones.indexOf('\n') + 1);
             cones = cones.replace(/(?:\r\n|\r|\n)/g, '');
+            cones = cones.substr(1, cones.length - 2);
+            cones = cones.replace(/-/g, '~');
+            cones = cones.replace(/([a-zA-Z_\d]+)\^(\d+)/g, function (sub, variable, exponent) {
+                var times = parseInt(exponent);
+                var content = [];
+                for (var k = 0; k < times; k++) {
+                    content.push(variable);
+                }
+                return content.join('*');
+            });
+            cones += ',';
+            var parts = cones.split('},');
+            parts.pop();
+            for (var i = 0; i < parts.length; i++) {
+                var part = parts[i].substr(1) + ',';
+                var polyParts = part.split(',');
+                polyParts.pop();
+                var cone = new ConeItem();
+                var latexParts = [];
+                for (var j = 0; j < polyParts.length; j++) {
+                    var p = FastMathConverter.run(MathsParser.parse(polyParts[j]));
+                    p.order();
+                    cone.basis.push(p);
+                    latexParts.push(this.toLatex(PolynomialPrinter.run(p)));
+                }
+                cone.basisLatex = '\\lbrace \\quad ' + latexParts.join(', \\quad ') + ' \\quad \\rbrace';
+                cone.systemLatex = this.reducePolynomialSystem(polynomialSystem, cone.basis);
+                this.cones.push(cone);
+            }
+        };
+        DiscreteFan.prototype.reducePolynomialSystem = function (polynomialSystem, vanishingIdeal) {
             // Reduce polynomial system
-            //var reducedPolynomialSystem: Polynomials.Polynomial[] = [];
-            //for (var l = 0; l < polynomialSystem.length; l++) {
-            //	var polyn = polynomialSystem[l];
-            //	var result = DivisionAlgorithm.run(polyn, vanishingIdeal);
-            //	reducedPolynomialSystem.push(result.r);
-            //}
-            //var reducedPolynomialSystemArray = [];
-            //for (var m = 0; m < reducedPolynomialSystem.length; m++) {
-            //	reducedPolynomialSystem[m].order();
-            //	reducedPolynomialSystemArray.push([`f_${m + 1}`, PolynomialPrinter.run(reducedPolynomialSystem[m])]);
-            //}
-            //this.reducedPolynomialSystemLatex(this.getEquationLatex(reducedPolynomialSystemArray));
+            var reducedPolynomialSystem = [];
+            for (var l = 0; l < polynomialSystem.length; l++) {
+                var polyn = polynomialSystem[l];
+                var result = DivisionAlgorithm.run(polyn, vanishingIdeal);
+                reducedPolynomialSystem.push(result.r);
+            }
+            var reducedPolynomialSystemArray = [];
+            for (var m = 0; m < reducedPolynomialSystem.length; m++) {
+                reducedPolynomialSystem[m].order();
+                reducedPolynomialSystemArray.push([("f_" + (m + 1)), PolynomialPrinter.run(reducedPolynomialSystem[m])]);
+            }
+            return this.getEquationLatex(reducedPolynomialSystemArray);
         };
         DiscreteFan.prototype.clear = function () {
             this.ringExpressions.removeAll();
