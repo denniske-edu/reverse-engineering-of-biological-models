@@ -182,7 +182,7 @@ module DiscreteFan {
 			//});
 
 			this.sampleI();
-			this.compute();
+			//this.compute();
 		}
 		
 		sampleII() {

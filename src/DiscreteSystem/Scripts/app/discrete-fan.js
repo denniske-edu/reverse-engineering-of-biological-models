@@ -109,7 +109,7 @@ var DiscreteFan;
             //	return this.getEquationLatex(this.groebnerExpressions());
             //});
             this.sampleI();
-            this.compute();
+            //this.compute();
         }
         DiscreteFan.prototype.sampleII = function () {
             this.discretize = false;
