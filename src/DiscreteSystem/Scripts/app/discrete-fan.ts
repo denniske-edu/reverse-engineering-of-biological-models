@@ -114,6 +114,8 @@ module DiscreteFan {
 			
 			this.computed = ko.observable(false);
 
+			this.errorText = ko.observable('');
+
 			this.variables = ko.observableArray();
 
 			this.thresholds = ko.observableArray();
@@ -230,6 +232,56 @@ module DiscreteFan {
 			//this.inputs.push(new InputItem(this, [0, 1, 0, 1, 0]));
 			//this.inputs.push(new InputItem(this, [0, 0, 1, 0, 0]));
 		}
+
+		//sampleI() {
+
+		//	this.discretize = true;
+			
+		//	// Z3-Ring
+		//	System.ring = new IntegerRingModulo(3);
+
+		//	this.variables.removeAll();
+		//	this.variables.push(new InputVariable(this, 'x_1'));
+		//	this.variables.push(new InputVariable(this, 'x_2'));
+
+		//	this.inputs.removeAll();
+		
+		//	this.inputs.push(new InputItem(this, [1.6104, 1.7104]));
+		//	this.inputs.push(new InputItem(this, [1.6973, 1.7973]));
+		//	this.inputs.push(new InputItem(this, [1.7254, 1.6254]));
+		//	this.inputs.push(new InputItem(this, [1.6011, 1.6011]));
+
+
+		//	this.thresholds.removeAll();
+		//	this.thresholds.push(new Threshold(this, 0, [null, null]));
+		//	this.thresholds.push(new Threshold(this, 1, [1.65, 1.65]));
+		//	this.thresholds.push(new Threshold(this, 2, [1.702, 1.702]));
+		//}
+
+
+		//sampleI() {
+
+		//	this.discretize = true;
+			
+		//	// Z3-Ring
+		//	System.ring = new IntegerRingModulo3Special();
+
+		//	this.variables.removeAll();
+		//	this.variables.push(new InputVariable(this, 'x_1'));
+		//	this.variables.push(new InputVariable(this, 'x_2'));
+
+		//	this.inputs.removeAll();
+
+		//	this.inputs.push(new InputItem(this, [1.6104, 1.2042]));
+		//	this.inputs.push(new InputItem(this, [1.6601, 1.4814]));
+		//	this.inputs.push(new InputItem(this, [1.7254, 1.4118]));
+
+
+		//	this.thresholds.removeAll();
+		//	this.thresholds.push(new Threshold(this, -1, [null, null]));
+		//	this.thresholds.push(new Threshold(this, 0, [1.65, 1.25]));
+		//	this.thresholds.push(new Threshold(this, 1, [1.702, 1.42]));
+		//}
 
 		sampleI() {
 
@@ -530,6 +582,8 @@ module DiscreteFan {
 			//	maximalIdeals.push(_.map(temps[l], s => FastMathConverter.run(MathsParser.parse(s))));
 			//}
 
+			//return;
+
 			var test1b = PolynomialPrinter.run(maximalIdeals[0][0]);
 
 			while (maximalIdeals.length > 1) {
@@ -580,12 +634,14 @@ module DiscreteFan {
 				// Work with the response
 				success(response) {
 					console.log(response); // server response
+					_this.errorText('');
 					_this.computeWithResult(polynomialSystem, response);
 				},
 
 				// Work with the response
 				error(response) {
 					console.log(response); // server response
+					_this.errorText('Could not contact server. Please call application author.');
 				}
 			});
 
@@ -756,6 +812,7 @@ module DiscreteFan {
 			this.thresholds.remove(e);
 		}
 
+		errorText;
 		ringExpressionsLatex;
 		simplifiedExpressionsLatex;
 		inputsLatex;

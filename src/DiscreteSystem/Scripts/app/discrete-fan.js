@@ -63,6 +63,7 @@ var DiscreteFan;
     var DiscreteFan = (function () {
         function DiscreteFan() {
             this.computed = ko.observable(false);
+            this.errorText = ko.observable('');
             this.variables = ko.observableArray();
             this.thresholds = ko.observableArray();
             this.inputsDiscrete = ko.observableArray();
@@ -147,6 +148,39 @@ var DiscreteFan;
             //this.inputs.push(new InputItem(this, [0, 1, 0, 1, 0]));
             //this.inputs.push(new InputItem(this, [0, 0, 1, 0, 0]));
         };
+        //sampleI() {
+        //	this.discretize = true;
+        //	// Z3-Ring
+        //	System.ring = new IntegerRingModulo(3);
+        //	this.variables.removeAll();
+        //	this.variables.push(new InputVariable(this, 'x_1'));
+        //	this.variables.push(new InputVariable(this, 'x_2'));
+        //	this.inputs.removeAll();
+        //	this.inputs.push(new InputItem(this, [1.6104, 1.7104]));
+        //	this.inputs.push(new InputItem(this, [1.6973, 1.7973]));
+        //	this.inputs.push(new InputItem(this, [1.7254, 1.6254]));
+        //	this.inputs.push(new InputItem(this, [1.6011, 1.6011]));
+        //	this.thresholds.removeAll();
+        //	this.thresholds.push(new Threshold(this, 0, [null, null]));
+        //	this.thresholds.push(new Threshold(this, 1, [1.65, 1.65]));
+        //	this.thresholds.push(new Threshold(this, 2, [1.702, 1.702]));
+        //}
+        //sampleI() {
+        //	this.discretize = true;
+        //	// Z3-Ring
+        //	System.ring = new IntegerRingModulo3Special();
+        //	this.variables.removeAll();
+        //	this.variables.push(new InputVariable(this, 'x_1'));
+        //	this.variables.push(new InputVariable(this, 'x_2'));
+        //	this.inputs.removeAll();
+        //	this.inputs.push(new InputItem(this, [1.6104, 1.2042]));
+        //	this.inputs.push(new InputItem(this, [1.6601, 1.4814]));
+        //	this.inputs.push(new InputItem(this, [1.7254, 1.4118]));
+        //	this.thresholds.removeAll();
+        //	this.thresholds.push(new Threshold(this, -1, [null, null]));
+        //	this.thresholds.push(new Threshold(this, 0, [1.65, 1.25]));
+        //	this.thresholds.push(new Threshold(this, 1, [1.702, 1.42]));
+        //}
         DiscreteFan.prototype.sampleI = function () {
             this.discretize = true;
             // Z3-Ring
@@ -359,6 +393,7 @@ var DiscreteFan;
             //for (var l = 0; l < temps.length; l++) {
             //	maximalIdeals.push(_.map(temps[l], s => FastMathConverter.run(MathsParser.parse(s))));
             //}
+            //return;
             var test1b = PolynomialPrinter.run(maximalIdeals[0][0]);
             while (maximalIdeals.length > 1) {
                 var a = maximalIdeals.shift();
@@ -392,11 +427,13 @@ var DiscreteFan;
                 // Work with the response
                 success: function (response) {
                     console.log(response); // server response
+                    _this.errorText('');
                     _this.computeWithResult(polynomialSystem, response);
                 },
                 // Work with the response
                 error: function (response) {
                     console.log(response); // server response
+                    _this.errorText('Could not contact server. Please call application author.');
                 }
             });
         };

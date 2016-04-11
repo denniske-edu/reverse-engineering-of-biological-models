@@ -61,6 +61,12 @@
 
 					<h3>Discretization Thresholds</h3>
 
+					<p>
+						<!--<button class="btn" data-bind="click: ring2">\( \mathbb{R}^2 (0, 1) \)</button>
+						<button class="btn" data-bind="click: ring3">\( \mathbb{R}^3 (0, 1, 2) \)</button>-->
+						<button class="btn" data-bind="click: ring3Special">\( \mathbb{R}^3 (-1, 0, 1) \)</button>
+					</p>
+
 					<table class="table" style="width: inherit">
 						<thead>
 							<tr>
@@ -81,13 +87,7 @@
 							</tr>
 						</tbody>
 					</table>
-
-					<p>
-						<button class="btn" data-bind="click: ring2">\( \mathbb{R}^2 (0, 1) \)</button>
-						<button class="btn" data-bind="click: ring3">\( \mathbb{R}^3 (0, 1, 2) \)</button>
-						<button class="btn" data-bind="click: ring3Special">\( \mathbb{R}^3 (-1, 0, 1) \)</button>
-					</p>
-
+					
 					<br />
 
 					<p>
@@ -138,6 +138,10 @@
 
 
 						<h3>Reduction of Polynomial System by bases of Gröbner cones</h3>
+						
+						<p>
+							<span data-bind="text: errorText"></span>
+						</p>
 
 						<div data-bind="foreach: cones">
 							<div style="margin-top: 30px;margin-bottom: 13px">
