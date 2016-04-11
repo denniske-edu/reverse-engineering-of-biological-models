@@ -14,6 +14,7 @@
 </head>
 <body>
 
+
 	<div class="container">
 		<div class="row">
 
@@ -30,25 +31,25 @@
 
 			<form class="form-inline">
 				<div class="form-group" style="display:block">
-					
+
 					<table class="table" style="width: inherit">
 						<thead>
-						<tr>
-							<th style="font-weight: normal;width:100px">Time Step</th>
-							<!-- ko foreach: variables -->
-							<th><input data-bind="textInput: v" style="border: 1px solid #DDD; padding: 8px;"/> <button class="btn btn-xs" data-bind="click: remove" title="Remove variable"><span class="glyphicon glyphicon-minus-sign"></span></button></th>
-							<!-- /ko -->
-							<th></th>
-						</tr>
+							<tr>
+								<th style="font-weight: normal;width:100px">Time Step</th>
+								<!-- ko foreach: variables -->
+								<th><input data-bind="textInput: v" style="border: 1px solid #DDD; padding: 8px;" /> <button class="btn btn-xs" data-bind="click: remove" title="Remove variable"><span class="glyphicon glyphicon-minus-sign"></span></button></th>
+								<!-- /ko -->
+								<th></th>
+							</tr>
 						</thead>
 						<tbody data-bind="foreach: inputs">
-						<tr>
-							<td data-bind="html: $index()+1"></td>
-							<!-- ko foreach: s -->
-							<td style="padding:0"><input data-bind="textInput: $data" style="border: none; padding: 8px; width: 100%;"/></td>
-							<!-- /ko -->
-							<td><button class="btn btn-xs" data-bind="click: remove" title="Remove"><span class="glyphicon glyphicon-minus-sign"></span></button></td>
-						</tr>
+							<tr>
+								<td data-bind="html: $index()+1"></td>
+								<!-- ko foreach: s -->
+								<td style="padding:0"><input data-bind="textInput: $data" style="border: none; padding: 8px; width: 100%;" /></td>
+								<!-- /ko -->
+								<td><button class="btn btn-xs" data-bind="click: remove" title="Remove"><span class="glyphicon glyphicon-minus-sign"></span></button></td>
+							</tr>
 						</tbody>
 					</table>
 
@@ -57,9 +58,15 @@
 						<button class="btn" data-bind="click: addVariable"><span class="glyphicon glyphicon-plus-sign"></span> Add variable</button>
 					</p>
 
-					<br/>
+					<br />
 
 					<h3>Discretization Thresholds</h3>
+
+					<p>
+						<!--<button class="btn" data-bind="click: ring2">\( \mathbb{R}^2 (0, 1) \)</button>
+						<button class="btn" data-bind="click: ring3">\( \mathbb{R}^3 (0, 1, 2) \)</button>-->
+						<button class="btn" data-bind="click: ring3Special">\( \mathbb{R}^3 (-1, 0, 1) \)</button>
+					</p>
 
 					<table class="table" style="width: inherit">
 						<thead>
@@ -82,12 +89,6 @@
 						</tbody>
 					</table>
 
-					<p>
-						<button class="btn" data-bind="click: ring2">\( \mathbb{R}^2 (0, 1) \)</button>
-						<button class="btn" data-bind="click: ring3">\( \mathbb{R}^3 (0, 1, 2) \)</button>
-						<button class="btn" data-bind="click: ring3Special">\( \mathbb{R}^3 (-1, 0, 1) \)</button>
-					</p>
-
 					<br />
 
 					<p>
@@ -102,26 +103,26 @@
 
 						<table class="table" style="width: inherit">
 							<thead>
-							<tr>
-								<th></th>
-								<!-- ko foreach: variables -->
-								<th data-bind="maths: v"></th>
-								<!-- /ko -->
-							</tr>
+								<tr>
+									<th></th>
+									<!-- ko foreach: variables -->
+									<th data-bind="maths: v"></th>
+									<!-- /ko -->
+								</tr>
 							</thead>
 							<tbody data-bind="foreach: inputsDiscrete">
-							<tr>
-								<td data-bind="html: $index()+1"></td>
-								<!-- ko foreach: s -->
-								<td data-bind="html: $data"></td>
-								<!-- /ko -->
-							</tr>
+								<tr>
+									<td data-bind="html: $index()+1"></td>
+									<!-- ko foreach: s -->
+									<td data-bind="html: $data"></td>
+									<!-- /ko -->
+								</tr>
 							</tbody>
 						</table>
 
 
 						<h3>Polynomial System</h3> <!-- in \( \mathbb{R}^3 \) -->
-						<br/>
+						<br />
 
 						<p>
 							<span data-bind="maths: polynomialSystemLatex"></span>
@@ -137,13 +138,24 @@
 						</p>
 
 
-
-						<h3>Reduction of Polynomial System by ideal</h3>
-						<br />
+						<h3>Reduction of Polynomial System by bases of Gröbner cones</h3>
 
 						<p>
-							<span data-bind="maths: reducedPolynomialSystemLatex"></span>
+							<span data-bind="text: errorText"></span>
 						</p>
+
+						<div data-bind="foreach: cones">
+							<div style="margin-top: 30px;margin-bottom: 13px">
+								<b>Cone <span data-bind="text: $index()+1"></span>:</b><br />
+								<div style="margin-top: 7px" data-bind="maths: basisLatex"></div>
+							</div>
+
+							Reduced Polynomial System:
+							<p style="margin-top: 12px">
+								<span data-bind="maths: systemLatex"></span>
+							</p>
+
+						</div>
 
 						<br />
 						<br />
@@ -156,7 +168,7 @@
 
 		</div>
 	</div>
-	
+
 
 	<script src="src/DiscreteSystem/Scripts/external/jquery-2.1.3.js"></script>
 	<script src="src/DiscreteSystem/Scripts/external/underscore.js"></script>
