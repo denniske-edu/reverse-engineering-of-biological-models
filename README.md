@@ -1,2 +1,2 @@
-# Computer Algebra in Systems Biology
-Bachelor thesis with software implementation for solving discrete systems using gröbner bases
+# Reverse engineering of biological models
+Science project with software implementation for reverse engineering discrete systems using gröbner fans
